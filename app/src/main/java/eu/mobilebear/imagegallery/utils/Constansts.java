@@ -8,6 +8,8 @@ import android.Manifest;
 
 public class Constansts {
 
+  public static final String IMAGE_JPEG = "image/jpeg";
+  public static final String TEST_MAIL = "test@gmail.com";
   public static final String SHARING_OPTIONS = "Sharing Options";
   public static final String EMAIL_SUBJECT = "Awesome Image";
   public static final String EMAIL_BODY = "Look at this picture!";

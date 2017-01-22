@@ -2,7 +2,9 @@ package eu.mobilebear.imagegallery.adapters;
 
 import static eu.mobilebear.imagegallery.utils.Constansts.EMAIL_BODY;
 import static eu.mobilebear.imagegallery.utils.Constansts.EMAIL_SUBJECT;
+import static eu.mobilebear.imagegallery.utils.Constansts.IMAGE_JPEG;
 import static eu.mobilebear.imagegallery.utils.Constansts.SHARING_OPTIONS;
+import static eu.mobilebear.imagegallery.utils.Constansts.TEST_MAIL;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,6 +29,7 @@ import java.util.List;
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
 public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
 
   private MainActivity activity;
   private List<Photo> photos;
@@ -63,8 +66,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     photoViewHolder.emailShare.setOnClickListener(view -> {
           Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-          emailIntent.setType("image/jpeg");
-          emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"test@gmail.com"});
+      emailIntent.setType(IMAGE_JPEG);
+      emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{TEST_MAIL});
           emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
           String emailBody = EMAIL_BODY + "\n" + photos.get(position).getMedia()
               .getMediaUrl();
@@ -74,8 +77,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     );
 
     photoViewHolder.webImageView.setOnClickListener(view -> {
-      Intent webIntent = new Intent(Intent.ACTION_VIEW);
-      webIntent.setData(Uri.parse(photos.get(position).getLink()));
+      Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(photos.get(position).getLink()));
       activity.startActivity(webIntent);
     });
 
