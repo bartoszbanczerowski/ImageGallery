@@ -1,7 +1,7 @@
 package eu.mobilebear.imagegallery.mvp.presenters;
 
 /**
- * @author bartoszbanczerowski@gmail.com Created on 16.01.2017.
+ * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
 interface Presenter<T> {
 

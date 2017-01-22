@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * @author bartoszbanczerowski@gmail.com Created on 16.01.2017.
+ * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
 public class APIResponse {
 

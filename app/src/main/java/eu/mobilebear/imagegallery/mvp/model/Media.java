@@ -1,29 +1,28 @@
 package eu.mobilebear.imagegallery.mvp.model;
 
 import com.google.gson.annotations.SerializedName;
-import io.realm.RealmObject;
 
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
 
-public class Media extends RealmObject {
+public class Media {
 
   @SerializedName("m")
-  private String media;
+  private String mediaUrl;
 
   public Media() {
   }
 
-  public Media(String media) {
-    this.media = media;
+  public Media(String mediaUrl) {
+    this.mediaUrl = mediaUrl;
   }
 
-  public String getMedia() {
-    return media;
+  public String getMediaUrl() {
+    return mediaUrl;
   }
 
-  public void setMedia(String media) {
-    this.media = media;
+  public void setMediaUrl(String mediaUrl) {
+    this.mediaUrl = mediaUrl;
   }
 }

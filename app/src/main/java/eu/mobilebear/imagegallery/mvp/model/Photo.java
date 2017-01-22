@@ -1,15 +1,12 @@
 package eu.mobilebear.imagegallery.mvp.model;
 
 import com.google.gson.annotations.SerializedName;
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
-public class Photo extends RealmObject {
+public class Photo {
 
-  @PrimaryKey
   @SerializedName("title")
   private String title;
 
@@ -129,7 +126,7 @@ public class Photo extends RealmObject {
   public String toString() {
     return "Photo: " + "\n" +
         "title: " + title + "\n" +
-        "media: " + media.getMedia() + "\n" +
+        "media: " + media.getMediaUrl() + "\n" +
         "dateTaken: " + dateTaken + "\n" +
         "description: " + description + "\n" +
         "published: " + published + "\n" +
