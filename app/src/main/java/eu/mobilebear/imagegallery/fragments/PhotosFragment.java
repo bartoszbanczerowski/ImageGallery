@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import eu.mobilebear.imagegallery.MainActivity;
 import eu.mobilebear.imagegallery.R;
 import eu.mobilebear.imagegallery.adapters.PhotosAdapter;
@@ -51,6 +52,7 @@ public class PhotosFragment extends Fragment implements PhotosView {
   private PhotosAdapter photosAdapter;
   private List<Photo> photos;
   private ProgressDialog progressDialog;
+  private Unbinder unbinder;
 
 
   public PhotosFragment() {
@@ -72,13 +74,14 @@ public class PhotosFragment extends Fragment implements PhotosView {
   @Override
   public void onDestroyView() {
     super.onDestroyView();
+    unbinder.unbind();
   }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_photos, container, false);
-    ButterKnife.bind(this, view);
+    unbinder = ButterKnife.bind(this, view);
     assignFieldsToVariables();
     return view;
   }
