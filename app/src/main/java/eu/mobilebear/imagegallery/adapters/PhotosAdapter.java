@@ -8,7 +8,10 @@ import static eu.mobilebear.imagegallery.utils.Constansts.TEST_MAIL;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -27,6 +30,9 @@ import java.util.List;
 
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
+ *
+ * PhotosAdapter provides access to the photos. Functionalities: saving photo into device's
+ * gallery, sharing image's link by email, moving the user to the website with specific photo.
  */
 public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -59,6 +65,17 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
   private void configurePhotoViewHolder(PhotoViewHolder photoViewHolder,
       final int position) {
+    photoViewHolder.itemView.setOnClickListener(view -> {
+      if (!activity.isPermissionGranted()) {
+        activity.requestPermissions();
+      } else{
+        String photoTitle = photos.get(position).getTitle();
+        String photoDescription = photos.get(position).getDescription();
+        Bitmap photoBitmap = ((BitmapDrawable) photoViewHolder.photo.getDrawable()).getBitmap();
+        MediaStore.Images.Media.insertImage(activity.getContentResolver(), photoBitmap, photoTitle,
+            photoDescription);
+      }
+    });
     photoViewHolder.titleTextView.setText(photos.get(position).getTitle());
     photoViewHolder.authorTextView.setText(photos.get(position).getAuthor());
     photoViewHolder.publishDateTextView.setText(photos.get(position).getPublished());
@@ -66,8 +83,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     photoViewHolder.emailShare.setOnClickListener(view -> {
           Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-      emailIntent.setType(IMAGE_JPEG);
-      emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{TEST_MAIL});
+          emailIntent.setType(IMAGE_JPEG);
+          emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{TEST_MAIL});
           emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
           String emailBody = EMAIL_BODY + "\n" + photos.get(position).getMedia()
               .getMediaUrl();
@@ -77,7 +94,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     );
 
     photoViewHolder.webImageView.setOnClickListener(view -> {
-      Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(photos.get(position).getLink()));
+      Intent webIntent = new Intent(Intent.ACTION_VIEW,
+          Uri.parse(photos.get(position).getLink()));
       activity.startActivity(webIntent);
     });
 

@@ -1,18 +1,9 @@
 package eu.mobilebear.imagegallery.fragments;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static eu.mobilebear.imagegallery.utils.Constansts.PHOTO_PERMISSIONS;
-import static eu.mobilebear.imagegallery.utils.Constansts.REQUEST_PHOTO;
-
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -36,7 +27,6 @@ import eu.mobilebear.imagegallery.utils.DateUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
-import timber.log.Timber;
 
 public class PhotosFragment extends Fragment implements PhotosView {
 
@@ -61,7 +51,7 @@ public class PhotosFragment extends Fragment implements PhotosView {
   private PhotosAdapter photosAdapter;
   private List<Photo> photos;
   private ProgressDialog progressDialog;
-  private boolean isPermissionGranted = false;
+
 
   public PhotosFragment() {
     // Required empty public constructor
@@ -102,51 +92,6 @@ public class PhotosFragment extends Fragment implements PhotosView {
     photoRecyclerView.setNestedScrollingEnabled(false);
   }
 
-  public void requestPermissions() {
-    if (ContextCompat.checkSelfPermission(getActivity(), WRITE_EXTERNAL_STORAGE)
-        != PERMISSION_GRANTED
-        || ContextCompat.checkSelfPermission(getActivity(), READ_EXTERNAL_STORAGE)
-        != PERMISSION_GRANTED) {
-      if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), WRITE_EXTERNAL_STORAGE)
-          || ActivityCompat
-          .shouldShowRequestPermissionRationale(getActivity(), READ_EXTERNAL_STORAGE)) {
-        if (mainLayout != null) {
-          Snackbar.make(mainLayout, R.string.photo_permissions_not_granted, Snackbar
-              .LENGTH_INDEFINITE)
-              .setAction(R.string.ok,
-                  v -> ActivityCompat.requestPermissions(getActivity(), PHOTO_PERMISSIONS,
-                      REQUEST_PHOTO)).show();
-        }
-      } else {
-        requestPermissions(PHOTO_PERMISSIONS, REQUEST_PHOTO);
-      }
-    } else {
-      isPermissionGranted = true;
-    }
-  }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-      @NonNull int[] grantResults) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode == REQUEST_PHOTO) {
-      Timber.i("Received response for Photo permission request.");
-      for (int grantResult : grantResults) {
-        if (grantResult != PERMISSION_GRANTED) {
-          Timber.i("Photo permission was NOT granted.");
-          Snackbar.make(mainLayout, R.string.photo_permissions_not_granted,
-              Snackbar.LENGTH_LONG).setAction(R.string.ok,
-              v -> requestPermissions(PHOTO_PERMISSIONS, REQUEST_PHOTO))
-              .show();
-          isPermissionGranted = false;
-        } else {
-          Snackbar.make(mainLayout, R.string.photo_permissions_granted, Snackbar.LENGTH_SHORT)
-              .show();
-          isPermissionGranted = true;
-        }
-      }
-    }
-  }
 
   private void injectDependencies() {
     if (getActivity() instanceof MainActivity) {
@@ -234,10 +179,5 @@ public class PhotosFragment extends Fragment implements PhotosView {
       progressDialog.dismiss();
     }
   }
-
-  public boolean isPermissionGranted() {
-    return isPermissionGranted;
-  }
-
 
 }
