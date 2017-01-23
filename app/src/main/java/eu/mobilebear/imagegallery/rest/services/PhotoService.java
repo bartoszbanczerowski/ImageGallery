@@ -16,8 +16,6 @@ import rx.Observable;
  */
 public interface PhotoService {
 
-//  https://api.flickr.com/services/feeds/photos_public.gne?api_key=2ef592bfddc86f508550184ec706a2fc&tags=men&format=json&nojsoncallback=1
-
   @GET("photos_public.gne")
   Observable<Response<APIResponse>> getPhotos(@Query(QUERY_API_KEY) String apiKey,
       @Query(QUERY_FORMAT) String format,
