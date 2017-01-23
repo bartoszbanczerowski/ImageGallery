@@ -1,14 +1,9 @@
 <resources>
   <dimen name="app_bar_height">180dp</dimen>
-  <dimen name="fab_margin">16dp</dimen>
-  <dimen name="text_margin">16dp</dimen>
-  <dimen name="default_margin_top">5dp</dimen>
   <dimen name="default_height_widget">60dp</dimen>
   <dimen name="default_margin">5dp</dimen>
   <dimen name="card_elevation">5dp</dimen>
   <dimen name="card_corner_radius">10dp</dimen>
   <dimen name="card_margin">10dp</dimen>
-  <dimen name="card_height">250dp</dimen>
-  <dimen name="default_padding">10dp</dimen>
   <dimen name="image_size">150dp</dimen>
 </resources>

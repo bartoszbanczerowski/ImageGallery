@@ -37,7 +37,7 @@ import java.util.List;
 public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-  private MainActivity activity;
+  private final MainActivity activity;
   private List<Photo> photos;
 
   public PhotosAdapter(Activity activity, List<Photo> photos) {

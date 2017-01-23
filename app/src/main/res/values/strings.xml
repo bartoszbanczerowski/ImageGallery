@@ -1,6 +1,5 @@
 <resources>
   <string name="app_name">ImageGallery</string>
-  <string name="action_settings">Settings</string>
   <string name="ok">OK</string>
   <string name="photo_permissions_not_granted">Permissions for saving Photo were not granted</string>
   <string name="photo_permissions_granted">Photo permissions were granted</string>

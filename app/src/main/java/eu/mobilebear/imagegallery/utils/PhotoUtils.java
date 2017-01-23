@@ -34,7 +34,7 @@ public class PhotoUtils {
    * @see android.provider.MediaStore.Images.Media#insertImage(ContentResolver, Bitmap, String,
    * String)
    */
-  public static final String insertImage(ContentResolver cr,
+  public static String insertImage(ContentResolver cr,
       Bitmap source,
       String title,
       String description) {
@@ -90,7 +90,7 @@ public class PhotoUtils {
    *
    * @see android.provider.MediaStore.Images.Media (StoreThumbnail private method)
    */
-  private static final Bitmap storeThumbnail(
+  private static Bitmap storeThumbnail(
       ContentResolver cr,
       Bitmap source,
       long id,
