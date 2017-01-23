@@ -64,4 +64,5 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.8'
     provided 'javax.annotation:jsr250-api:1.0'
     testApt 'com.google.dagger:dagger-compiler:2.8'
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.7'
 }

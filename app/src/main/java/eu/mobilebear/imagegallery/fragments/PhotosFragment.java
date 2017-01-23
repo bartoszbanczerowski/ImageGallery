@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import eu.mobilebear.imagegallery.injection.components.PhotoComponent;
 import eu.mobilebear.imagegallery.mvp.model.Photo;
 import eu.mobilebear.imagegallery.mvp.presenters.PhotosPresenter;
 import eu.mobilebear.imagegallery.mvp.view.PhotosView;
+import eu.mobilebear.imagegallery.utils.DateUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -52,6 +54,9 @@ public class PhotosFragment extends Fragment implements PhotosView {
 
   @BindView(R.id.photosRecyclerView)
   RecyclerView photoRecyclerView;
+
+  @BindView(R.id.sortSwitch)
+  SwitchCompat sortSwitch;
 
   private PhotosAdapter photosAdapter;
   private List<Photo> photos;
@@ -153,18 +158,21 @@ public class PhotosFragment extends Fragment implements PhotosView {
 
   @Override
   public void showPhotos(List<Photo> photos) {
+    this.photos.clear();
+    sortSwitch.setVisibility(View.VISIBLE);
+    sortSwitch.setClickable(true);
     this.photos.addAll(photos);
     photosAdapter.notifyDataSetChanged();
   }
 
   @Override
   public void showLoading() {
-
+    launchProgressDialog();
   }
 
   @Override
   public void dismissLoading() {
-
+    dismissProgressDialog();
   }
 
   @Override
@@ -200,8 +208,19 @@ public class PhotosFragment extends Fragment implements PhotosView {
   @OnClick(R.id.searchButton)
   void searchForPhotos() {
     photos.clear();
-    Timber.d("Tag: " + tagEditText.getText().toString());
+    sortSwitch.setVisibility(View.INVISIBLE);
     photosPresenter.searchForPhotos(tagEditText.getText().toString());
+  }
+
+  @OnClick(R.id.sortSwitch)
+  void sortPhotos() {
+    if (sortSwitch.isChecked()) {
+      photosPresenter.sortListByDate(photos, DateUtils.TAKEN_DATE);
+    } else {
+      photosPresenter.sortListByDate(photos, DateUtils.PUBLISHED_DATE);
+    }
+    sortSwitch.setClickable(false);
+
   }
 
   private void launchProgressDialog() {
@@ -219,5 +238,6 @@ public class PhotosFragment extends Fragment implements PhotosView {
   public boolean isPermissionGranted() {
     return isPermissionGranted;
   }
+
 
 }

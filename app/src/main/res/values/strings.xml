@@ -9,4 +9,7 @@
   <string name="author">Author:</string>
   <string name="date_published">Date published:</string>
   <string name="date_taken">Date taken:</string>
+  <string name="sort">Sort</string>
+  <string name="publish_date">Publish Date</string>
+  <string name="taken_date">Taken Date</string>
 </resources>
