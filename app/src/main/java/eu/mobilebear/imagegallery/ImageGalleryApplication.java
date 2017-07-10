@@ -1,6 +1,7 @@
 package eu.mobilebear.imagegallery;
 
 import android.app.Application;
+import com.squareup.picasso.Picasso;
 import eu.mobilebear.imagegallery.injection.Injector;
 import io.realm.Realm;
 import timber.log.Timber;
@@ -16,6 +17,7 @@ public class ImageGalleryApplication extends Application {
     initLogging();
     initDagger();
     initRealm();
+    initPicasso();
   }
 
   private void initDagger() {
@@ -31,5 +33,9 @@ public class ImageGalleryApplication extends Application {
 
   private void initRealm() {
     Realm.init(this);
+  }
+
+  private void initPicasso() {
+    Picasso.setSingletonInstance(Injector.getApplicationComponent().getPicasso());
   }
 }
