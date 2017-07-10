@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
-
 public class Media {
 
   @SerializedName("m")

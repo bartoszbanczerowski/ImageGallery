@@ -1,5 +1,6 @@
 package eu.mobilebear.imagegallery.mvp.view;
 
+import android.graphics.Bitmap;
 import eu.mobilebear.imagegallery.mvp.model.Photo;
 import java.util.List;
 
@@ -10,4 +11,9 @@ public interface PhotosView extends View {
 
   void showPhotos(List<Photo> photos);
 
+  void onEmailShareClicked(int position);
+
+  void onWebLinkClicked(int position);
+
+  void onPhotoItemClicked(int position, Bitmap photosBitmap);
 }

@@ -1,7 +1,18 @@
 package eu.mobilebear.imagegallery.fragments;
 
+import static eu.mobilebear.imagegallery.utils.Constants.EMAIL_BODY;
+import static eu.mobilebear.imagegallery.utils.Constants.EMAIL_SUBJECT;
+import static eu.mobilebear.imagegallery.utils.Constants.IMAGE_JPEG;
+import static eu.mobilebear.imagegallery.utils.Constants.SHARING_OPTIONS;
+import static eu.mobilebear.imagegallery.utils.Constants.TEST_MAIL;
+
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,10 +66,19 @@ public class PhotosFragment extends Fragment implements PhotosView {
   private Unbinder unbinder;
 
 
+  /**
+   * Default {@link PhotosFragment} constructor. It shouldn't be used.
+   * Instead use @link{{@link PhotosFragment#newInstance()}} method;
+   */
   public PhotosFragment() {
     // Required empty public constructor
   }
 
+  /**
+   * Creates instance of @{@link PhotosFragment};
+   *
+   * @return {@link PhotosFragment} instance.
+   */
   public static PhotosFragment newInstance() {
     return new PhotosFragment();
   }
@@ -68,13 +88,7 @@ public class PhotosFragment extends Fragment implements PhotosView {
     super.onCreate(savedInstanceState);
     setRetainInstance(true);
     injectDependencies();
-    photosPresenter.attachView(this);
-  }
-
-  @Override
-  public void onDestroyView() {
-    super.onDestroyView();
-    unbinder.unbind();
+    photosPresenter.initialize(this);
   }
 
   @Override
@@ -82,27 +96,16 @@ public class PhotosFragment extends Fragment implements PhotosView {
       Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_photos, container, false);
     unbinder = ButterKnife.bind(this, view);
-    assignFieldsToVariables();
+    initializeRecyclerView();
     return view;
   }
 
-  private void assignFieldsToVariables() {
-    photos = new ArrayList<>();
-    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-    photoRecyclerView.setLayoutManager(linearLayoutManager);
-    photosAdapter = new PhotosAdapter(getActivity(), photos);
-    photoRecyclerView.setAdapter(photosAdapter);
-    photoRecyclerView.setNestedScrollingEnabled(false);
+  @Override
+  public void onDestroyView() {
+    unbinder.unbind();
+    super.onDestroyView();
   }
 
-
-  private void injectDependencies() {
-    if (getActivity() instanceof MainActivity) {
-      MainActivity activity = (MainActivity) getActivity();
-      PhotoComponent photoComponent = activity.getPhotoComponent();
-      photoComponent.inject(this);
-    }
-  }
 
   @Override
   public void showPhotos(List<Photo> photos) {
@@ -111,6 +114,38 @@ public class PhotosFragment extends Fragment implements PhotosView {
     sortSwitch.setClickable(true);
     this.photos.addAll(photos);
     photosAdapter.notifyDataSetChanged();
+  }
+
+  @Override
+  public void onEmailShareClicked(int position) {
+    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+    emailIntent.setType(IMAGE_JPEG);
+    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{TEST_MAIL});
+    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
+    String emailBody = EMAIL_BODY + "\n" + photos.get(position).getMedia()
+        .getMediaUrl();
+    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, emailBody);
+    getActivity().startActivity(Intent.createChooser(emailIntent, SHARING_OPTIONS));
+  }
+
+  @Override
+  public void onWebLinkClicked(int position) {
+    Intent webIntent = new Intent(Intent.ACTION_VIEW,
+        Uri.parse(photos.get(position).getLink()));
+    getActivity().startActivity(webIntent);
+  }
+
+  @Override
+  public void onPhotoItemClicked(int position, Bitmap photosBitmap) {
+    MainActivity activity = (MainActivity) getActivity();
+    if (!activity.isPermissionGranted()) {
+      activity.requestPermissions();
+    } else {
+      String photoTitle = photos.get(position).getTitle();
+      String photoDescription = photos.get(position).getDescription();
+      MediaStore.Images.Media.insertImage(activity.getContentResolver(), photosBitmap, photoTitle,
+          photoDescription);
+    }
   }
 
   @Override
@@ -124,7 +159,7 @@ public class PhotosFragment extends Fragment implements PhotosView {
   }
 
   @Override
-  public void showError(String message) {
+  public void showError(@StringRes int message) {
     Snackbar.make(mainLayout, message, Snackbar.LENGTH_SHORT).show();
   }
 
@@ -171,9 +206,27 @@ public class PhotosFragment extends Fragment implements PhotosView {
 
   }
 
+  private void initializeRecyclerView() {
+    photos = new ArrayList<>();
+    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+    photoRecyclerView.setLayoutManager(linearLayoutManager);
+    photosAdapter = new PhotosAdapter(this, photos);
+    photoRecyclerView.setAdapter(photosAdapter);
+    photoRecyclerView.setNestedScrollingEnabled(false);
+  }
+
+  private void injectDependencies() {
+    if (getActivity() instanceof MainActivity) {
+      MainActivity activity = (MainActivity) getActivity();
+      PhotoComponent photoComponent = activity.getPhotoComponent();
+      photoComponent.inject(this);
+    }
+  }
+
   private void launchProgressDialog() {
     progressDialog = ProgressDialog
-        .show(getActivity(), "Please wait", "Downloading...", true);
+        .show(getActivity(), getString(R.string.progess_dialog_title),
+            getString(R.string.progress_dialog_description), true);
     progressDialog.setCancelable(true);
   }
 
@@ -182,5 +235,4 @@ public class PhotosFragment extends Fragment implements PhotosView {
       progressDialog.dismiss();
     }
   }
-
 }

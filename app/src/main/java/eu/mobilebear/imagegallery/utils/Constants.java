@@ -5,8 +5,7 @@ import android.Manifest;
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  */
-
-public class Constansts {
+public class Constants {
 
   public static final String IMAGE_JPEG = "image/jpeg";
   public static final String TEST_MAIL = "test@gmail.com";

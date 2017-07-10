@@ -6,16 +6,16 @@ package eu.mobilebear.imagegallery.mvp.presenters;
 interface Presenter<T> {
 
   /**
+   * Method that initialize presenter. It should be called in the view's (Activity or Fragment)
+   * onCreate() method.
+   */
+  void initialize(T view);
+
+  /**
    * Method that control the lifecycle of the view. It should be called in the view's (Activity or
    * Fragment) onStart() method.
    */
   void onStart();
-
-  /**
-   * Method that control the lifecycle of the view. It should be called in the view's (Activity or
-   * Fragment) onStop() method.
-   */
-  void onStop();
 
   /**
    * Method that control the lifecycle of the view. It should be called in the view's (Activity or
@@ -30,10 +30,8 @@ interface Presenter<T> {
   void onPause();
 
   /**
-   * Method that attachView to presenter. It should be called in the view's (Activity or Fragment)
-   * onCreate() method.
+   * Method that control the lifecycle of the view. It should be called in the view's (Activity or
+   * Fragment) onStop() method.
    */
-  void attachView(T view);
-
-
+  void onStop();
 }

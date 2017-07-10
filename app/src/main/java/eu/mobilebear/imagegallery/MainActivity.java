@@ -3,8 +3,8 @@ package eu.mobilebear.imagegallery;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static eu.mobilebear.imagegallery.utils.Constansts.PHOTO_PERMISSIONS;
-import static eu.mobilebear.imagegallery.utils.Constansts.REQUEST_PHOTO;
+import static eu.mobilebear.imagegallery.utils.Constants.PHOTO_PERMISSIONS;
+import static eu.mobilebear.imagegallery.utils.Constants.REQUEST_PHOTO;
 import static eu.mobilebear.imagegallery.utils.FragmentUtils.PHOTOS_FRAGMENT;
 
 import android.annotation.TargetApi;
@@ -29,7 +29,6 @@ import eu.mobilebear.imagegallery.injection.components.PhotoComponent;
 import eu.mobilebear.imagegallery.injection.modules.ActivityModule;
 import eu.mobilebear.imagegallery.rest.RestClient;
 import javax.inject.Inject;
-import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,12 +49,6 @@ public class MainActivity extends AppCompatActivity {
   private boolean isPermissionGranted = false;
 
   @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    unbinder.unbind();
-  }
-
-  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
@@ -69,11 +62,10 @@ public class MainActivity extends AppCompatActivity {
         .commit();
   }
 
-  private void initializePhotoComponent(Activity activity) {
-    photoComponent = DaggerPhotoComponent.builder()
-        .applicationComponent(Injector.getApplicationComponent())
-        .activityModule(new ActivityModule(activity))
-        .build();
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    unbinder.unbind();
   }
 
   public PhotoComponent getPhotoComponent() {
@@ -110,10 +102,8 @@ public class MainActivity extends AppCompatActivity {
       @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == REQUEST_PHOTO) {
-      Timber.i("Received response for Photo permission request.");
       for (int grantResult : grantResults) {
         if (grantResult != PERMISSION_GRANTED) {
-          Timber.i("Photo permission was NOT granted.");
           Snackbar.make(container, R.string.photo_permissions_not_granted,
               Snackbar.LENGTH_LONG).setAction(R.string.ok,
               v -> requestPermissions(PHOTO_PERMISSIONS, REQUEST_PHOTO))
@@ -131,6 +121,13 @@ public class MainActivity extends AppCompatActivity {
   @TargetApi(VERSION_CODES.M)
   public boolean isPermissionGranted() {
     return isPermissionGranted;
+  }
+
+  private void initializePhotoComponent(Activity activity) {
+    photoComponent = DaggerPhotoComponent.builder()
+        .applicationComponent(Injector.getApplicationComponent())
+        .activityModule(new ActivityModule(activity))
+        .build();
   }
 
 }

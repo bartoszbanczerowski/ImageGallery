@@ -11,4 +11,10 @@
   <string name="sort">Sort</string>
   <string name="publish_date">Publish Date</string>
   <string name="taken_date">Taken Date</string>
+  <string name="progess_dialog_title">Please wait</string>
+  <string name="progress_dialog_description">Downloading…</string>
+  <string name="no_tag_error_message">We coudn\'t find photos by this tag. Sorry</string>
+  <string name="generic_error_message">Something went wrong</string>
+  <string name="sort_error_message">Cound\'t sort the list.</string>
+  <string name="empty_tag_error_message">Tag is empty.</string>
 </resources>

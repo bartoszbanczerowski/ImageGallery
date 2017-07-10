@@ -1,17 +1,7 @@
 package eu.mobilebear.imagegallery.adapters;
 
-import static eu.mobilebear.imagegallery.utils.Constansts.EMAIL_BODY;
-import static eu.mobilebear.imagegallery.utils.Constansts.EMAIL_SUBJECT;
-import static eu.mobilebear.imagegallery.utils.Constansts.IMAGE_JPEG;
-import static eu.mobilebear.imagegallery.utils.Constansts.SHARING_OPTIONS;
-import static eu.mobilebear.imagegallery.utils.Constansts.TEST_MAIL;
-
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -22,26 +12,26 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
-import eu.mobilebear.imagegallery.MainActivity;
 import eu.mobilebear.imagegallery.R;
 import eu.mobilebear.imagegallery.mvp.model.Photo;
-import eu.mobilebear.imagegallery.utils.BitmapTransform;
+import eu.mobilebear.imagegallery.mvp.view.PhotosView;
 import java.util.List;
 
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
  *
- * PhotosAdapter provides access to the photos. Functionalities: saving photo into device's
- * gallery, sharing image's link by email, moving the user to the website with specific photo.
+ *         PhotosAdapter provides access to the photos. Functionalities: saving photo into device's
+ *         gallery, sharing image's link by email, moving the user to the website with specific
+ *         photo.
  */
 public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-  private final MainActivity activity;
+  private PhotosView photosView;
   private List<Photo> photos;
 
-  public PhotosAdapter(Activity activity, List<Photo> photos) {
-    this.activity = (MainActivity) activity;
+  public PhotosAdapter(PhotosView view, List<Photo> photos) {
+    photosView = view;
     this.photos = photos;
   }
 
@@ -63,48 +53,27 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     return photos.size();
   }
 
-  private void configurePhotoViewHolder(PhotoViewHolder photoViewHolder,
-      final int position) {
-    photoViewHolder.itemView.setOnClickListener(view -> {
-      if (!activity.isPermissionGranted()) {
-        activity.requestPermissions();
-      } else{
-        String photoTitle = photos.get(position).getTitle();
-        String photoDescription = photos.get(position).getDescription();
-        Bitmap photoBitmap = ((BitmapDrawable) photoViewHolder.photo.getDrawable()).getBitmap();
-        MediaStore.Images.Media.insertImage(activity.getContentResolver(), photoBitmap, photoTitle,
-            photoDescription);
-      }
-    });
+  private void configurePhotoViewHolder(PhotoViewHolder photoViewHolder, final int position) {
+
+    Picasso.with(photoViewHolder.photo.getContext())
+        .load(photos.get(position).getMedia().getMediaUrl())
+        .fit()
+        .placeholder(R.drawable.image_placeholder)
+        .error(R.drawable.image_error)
+        .into(photoViewHolder.photo);
+
     photoViewHolder.titleTextView.setText(photos.get(position).getTitle());
     photoViewHolder.authorTextView.setText(photos.get(position).getAuthor());
     photoViewHolder.publishDateTextView.setText(photos.get(position).getPublished());
     photoViewHolder.takenDateTextView.setText(photos.get(position).getDateTaken());
 
-    photoViewHolder.emailShare.setOnClickListener(view -> {
-          Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-          emailIntent.setType(IMAGE_JPEG);
-          emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{TEST_MAIL});
-          emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
-          String emailBody = EMAIL_BODY + "\n" + photos.get(position).getMedia()
-              .getMediaUrl();
-          emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, emailBody);
-          activity.startActivity(Intent.createChooser(emailIntent, SHARING_OPTIONS));
-        }
-    );
-
-    photoViewHolder.webImageView.setOnClickListener(view -> {
-      Intent webIntent = new Intent(Intent.ACTION_VIEW,
-          Uri.parse(photos.get(position).getLink()));
-      activity.startActivity(webIntent);
+    photoViewHolder.itemView.setOnClickListener(view -> {
+      Bitmap photoBitmap = ((BitmapDrawable) photoViewHolder.photo.getDrawable()).getBitmap();
+      photosView.onPhotoItemClicked(position, photoBitmap);
     });
 
-    Picasso.with(activity)
-        .load(photos.get(position).getMedia().getMediaUrl())
-        .resize(BitmapTransform.getSize(), BitmapTransform.getSize())
-        .placeholder(R.drawable.image_placeholder)
-        .error(R.drawable.image_error)
-        .into(photoViewHolder.photo);
+    photoViewHolder.emailShare.setOnClickListener(view -> photosView.onEmailShareClicked(position));
+    photoViewHolder.webImageView.setOnClickListener(view -> photosView.onWebLinkClicked(position));
   }
 
   class PhotoViewHolder extends RecyclerView.ViewHolder {
@@ -135,5 +104,4 @@ public class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
       ButterKnife.bind(this, itemView);
     }
   }
-
 }

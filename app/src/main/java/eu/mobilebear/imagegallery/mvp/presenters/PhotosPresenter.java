@@ -5,7 +5,9 @@ import static eu.mobilebear.imagegallery.rest.RestClient.JSON_FORMAT;
 import static eu.mobilebear.imagegallery.rest.RestClient.RAW_JSON;
 import static java.net.HttpURLConnection.HTTP_OK;
 
-import android.text.TextUtils;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import eu.mobilebear.imagegallery.R;
 import eu.mobilebear.imagegallery.mvp.model.APIResponse;
 import eu.mobilebear.imagegallery.mvp.model.Photo;
 import eu.mobilebear.imagegallery.mvp.view.PhotosView;
@@ -21,7 +23,6 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
-import timber.log.Timber;
 
 /**
  * @author bartoszbanczerowski@gmail.com Created on 22.01.2017.
@@ -38,73 +39,70 @@ public class PhotosPresenter implements Presenter<PhotosView> {
   }
 
   @Override
+  public void initialize(PhotosView view) {
+    this.view = view;
+  }
+
+  @Override
   public void onStart() {
     photos = new ArrayList<>();
     compositeSubscription = new CompositeSubscription();
   }
 
   @Override
+  public void onResume() {
+    /* no op */
+  }
+
+  @Override
+  public void onPause() {
+    /* no op */
+  }
+
+  @Override
   public void onStop() {
     view.dismissLoading();
-    photos.clear();
     if (compositeSubscription != null && compositeSubscription.isUnsubscribed()) {
       compositeSubscription.unsubscribe();
     }
   }
 
-  @Override
-  public void onResume() {
-
-  }
-
-  @Override
-  public void onPause() {
-
-  }
-
-  @Override
-  public void attachView(PhotosView view) {
-    this.view = view;
-  }
-
   public void searchForPhotos(String tag) {
-    if (!TextUtils.isEmpty(tag)) {
-      Timber.d("Photos: " + tag);
+    if (!(tag == null || tag.length() == 0)) {
       view.showLoading();
       compositeSubscription.add(getApiResponse(tag));
     } else {
-      view.showError("Tag is empty.");
+      view.showError(R.string.empty_tag_error_message);
     }
   }
 
-  private Subscription getApiResponse(String tag) {
+  @VisibleForTesting
+  private Subscription getApiResponse(@NonNull final String tag) {
     return restClient.getPhotoService()
         .getPhotos(FLICKR_API_KEY, JSON_FORMAT, RAW_JSON, tag)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::retrieveData, throwable -> view.showError(throwable.getMessage()));
+        .subscribe(new ApiResponseSubscription());
   }
 
+  @VisibleForTesting
   private void retrieveData(Response<APIResponse> response) {
     if (response.code() != HTTP_OK) {
-      view.showError("Something went wrong: " + response.errorBody().toString());
+      view.showError(R.string.generic_error_message);
       return;
     }
     getPhotos(response);
   }
 
-
+  @VisibleForTesting
   private void getPhotos(Response<APIResponse> response) {
-    Timber.d("Photos: " + response.body().getPhotos().size());
     APIResponse apiResponse = response.body();
     List<Photo> searchedPhotos = apiResponse.getPhotos();
     if (searchedPhotos == null || searchedPhotos.isEmpty()) {
       view.dismissLoading();
-      view.showError("We coudn't find photos by this tag. Sorry");
+      view.showError(R.string.no_tag_error_message);
       return;
     }
-
-    Timber.d("PhotosSearched: " + searchedPhotos.size());
 
     photos.addAll(searchedPhotos);
     view.showPhotos(photos);
@@ -138,26 +136,44 @@ public class PhotosPresenter implements Presenter<PhotosView> {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread());
 
-    Subscription sortSubscription = sortedPhotosObservable
-        .subscribe(new Subscriber<List<Photo>>() {
-          @Override
-          public void onCompleted() {
-            unsubscribe();
-          }
-
-          @Override
-          public void onError(Throwable e) {
-            view.showError("Cound't sort the list.");
-          }
-
-          @Override
-          public void onNext(List<Photo> photos) {
-            view.showPhotos(photos);
-            view.dismissLoading();
-          }
-        });
-
-    compositeSubscription.add(sortSubscription);
+    compositeSubscription.add(sortedPhotosObservable.subscribe(new SortSubscription()));
   }
 
+
+  private class SortSubscription extends Subscriber<List<Photo>> {
+
+    @Override
+    public void onCompleted() {
+      /* no op */
+    }
+
+    @Override
+    public void onError(Throwable e) {
+      view.showError(R.string.sort_error_message);
+    }
+
+    @Override
+    public void onNext(List<Photo> photos) {
+      view.showPhotos(photos);
+      view.dismissLoading();
+    }
+  }
+
+  private class ApiResponseSubscription extends Subscriber<Response<APIResponse>> {
+
+    @Override
+    public void onCompleted() {
+      /* no op */
+    }
+
+    @Override
+    public void onError(Throwable e) {
+      view.showError(R.string.generic_error_message);
+    }
+
+    @Override
+    public void onNext(Response<APIResponse> apiResponseResponse) {
+      retrieveData(apiResponseResponse);
+    }
+  }
 }
