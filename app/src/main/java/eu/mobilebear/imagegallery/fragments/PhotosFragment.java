@@ -203,7 +203,6 @@ public class PhotosFragment extends Fragment implements PhotosView {
       photosPresenter.sortListByDate(photos, DateUtils.PUBLISHED_DATE);
     }
     sortSwitch.setClickable(false);
-
   }
 
   private void initializeRecyclerView() {

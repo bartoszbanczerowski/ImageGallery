@@ -14,7 +14,6 @@ import org.joda.time.format.DateTimeFormatter;
 public class DateUtils {
 
   private static final String PUBLISH_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-  private static final String TAKEN_DATE_FORMAT = "dd-MM-yyyyTHH:mm:ss.sssZ";
   public static final String PUBLISHED_DATE = "publishedDate";
   public static final String TAKEN_DATE = "takenDate";
 
