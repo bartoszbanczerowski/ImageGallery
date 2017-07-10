@@ -39,7 +39,7 @@ public class ApplicationModule {
 
   @Provides
   @ImagePreferences
-  SharedPreferences getCarPreferences(@ApplicationContext Context context) {
+  SharedPreferences getPhotosPreferences(@ApplicationContext Context context) {
     return context.getSharedPreferences(IMAGE_PREFERENCES, Context.MODE_PRIVATE);
   }
 }

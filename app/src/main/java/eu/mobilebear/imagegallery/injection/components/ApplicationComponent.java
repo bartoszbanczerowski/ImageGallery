@@ -2,6 +2,7 @@ package eu.mobilebear.imagegallery.injection.components;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.squareup.picasso.Picasso;
 import dagger.Component;
 import eu.mobilebear.imagegallery.ImageGalleryApplication;
 import eu.mobilebear.imagegallery.injection.annotations.ApplicationContext;
@@ -21,16 +22,18 @@ import javax.inject.Singleton;
 @Component(modules = {ApplicationModule.class, NetworkModule.class, RealmModule.class})
 public interface ApplicationComponent {
 
-  void inject(ImageGalleryApplication myCvApplication);
+  void inject(ImageGalleryApplication imageGalleryApplication);
 
   @ApplicationContext
   Context getApplicationContext();
 
   @GetImages
-  Realm getCarsRealm();
+  Realm getPhotoRealm();
 
   @ImagePreferences
   SharedPreferences getCarSharedPreferences();
 
   RestClient getRestClient();
+
+  Picasso getPicasso();
 }
