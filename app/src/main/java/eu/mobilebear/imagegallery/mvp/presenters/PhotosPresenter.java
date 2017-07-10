@@ -149,6 +149,7 @@ public class PhotosPresenter implements Presenter<PhotosView> {
 
     @Override
     public void onError(Throwable e) {
+      view.dismissLoading();
       view.showError(R.string.sort_error_message);
     }
 
@@ -168,6 +169,7 @@ public class PhotosPresenter implements Presenter<PhotosView> {
 
     @Override
     public void onError(Throwable e) {
+      view.dismissLoading();
       view.showError(R.string.generic_error_message);
     }
 
